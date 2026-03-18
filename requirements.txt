@@ -1,0 +1,27 @@
+# Flask backend
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-SQLAlchemy==3.1.1
+Werkzeug==3.0.1
+
+# Ollama API
+requests==2.31.0
+
+# NLP for scoring (optional - install separately if needed)
+# spacy==3.7.2
+
+# Text-to-speech (optional)
+# pyttsx3==2.90
+
+# Utilities
+python-dateutil==2.8.2
+
+# Text-to-speech for 3D Avatar (Kokoro TTS - local neural TTS)
+kokoro>=0.9.4
+soundfile>=0.12.1
+
+# Speech-to-text (Whisper)
+openai-whisper
+pydub
+SpeechRecognition
+python-dotenv
