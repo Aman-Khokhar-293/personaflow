@@ -1,7 +1,7 @@
 """
 PersonaFlow AI Service
-Handles AI conversation logic using Google Gemini API.
-System prompt building is delegated to agent_behavior.py.
+Handles AI conversation logic.
+Supports OpenRouter API (free models).
 """
 import requests
 import json
@@ -10,16 +10,52 @@ from agent_behavior import build_system_prompt
 
 class AIService:
     def __init__(self):
-        self.api_key = Config.GEMINI_API_KEY
-        self.model = Config.GEMINI_MODEL
-        self.base_url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        self.api_key = Config.OPENROUTER_API_KEY
+        self.model = Config.OPENROUTER_MODEL
+        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
-    def _get_gemini_text_from_response(self, response_json):
-        """Helper to extract text from Gemini response."""
-        try:
-            return response_json.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
-        except (IndexError, AttributeError):
-            return None
+    # ── Unified API call ─────────────────────────────────────────────
+
+    def _call_api(self, system_prompt, contents, timeout=60):
+        """
+        Send a request to OpenRouter API.
+        `contents` should be a list of {'role': 'user'|'assistant', 'content': str}
+        """
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+            "HTTP-Referer": "http://localhost:5000",
+            "X-Title": "PersonaFlow"
+        }
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+
+        for msg in contents:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+
+        payload = {
+            "model": self.model,
+            "messages": messages
+        }
+
+        response = requests.post(self.base_url, headers=headers, json=payload, timeout=timeout)
+
+        if response.status_code == 200:
+            data = response.json()
+            try:
+                return data['choices'][0]['message']['content']
+            except (KeyError, IndexError):
+                return None
+        elif response.status_code in [400, 401, 403]:
+            return "API Key is missing or invalid. Please check your backend configuration."
+        elif response.status_code == 429:
+            return "API rate limit reached. Please wait a moment and try again."
+        else:
+            return f"AI API Error (HTTP {response.status_code}): {response.text[:200]}"
+
+    # ── Public methods ───────────────────────────────────────────────
 
     def generate_response(self, agent, messages, user_message, mode='text'):
         """
@@ -30,34 +66,10 @@ class AIService:
         conversation = self._build_conversation(messages, user_message)
 
         try:
-            headers = {"Content-Type": "application/json"}
-            payload = {
-                "systemInstruction": {
-                    "parts": [{"text": system_prompt}]
-                },
-                "contents": conversation
-            }
-
-            response = requests.post(
-                self.base_url,
-                headers=headers,
-                json=payload,
-                timeout=60
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-                text = self._get_gemini_text_from_response(result)
-                if text:
-                    return text
+            result = self._call_api(system_prompt, conversation, timeout=60)
+            if result is None:
                 return 'I apologize, but I encountered an issue parsing the response.'
-            elif response.status_code in [400, 403]:
-                return "API Key is missing or invalid. Please check your backend configuration."
-            elif response.status_code == 429:
-                return "Gemini API Error: Quota exceeded. Please check your API billing details."
-            else:
-                return f"Gemini API Error (HTTP {response.status_code}): {response.text}"
-
+            return result
         except requests.exceptions.Timeout:
             return "I apologize, but my response is taking too long. Please try again."
         except Exception as e:
@@ -65,33 +77,25 @@ class AIService:
             return "I apologize, but I encountered an unexpected error. Please try again."
 
     def _build_conversation(self, messages, user_message):
-        """Convert message history to Gemini format."""
+        """Convert message history to chat format."""
         conversation = []
         for msg in messages:
-            role = "model" if msg.role == "agent" else "user"
-            conversation.append({
-                "role": role,
-                "parts": [{"text": msg.content}]
-            })
+            role = "assistant" if msg.role == "agent" else "user"
+            conversation.append({"role": role, "content": msg.content})
 
-        conversation.append({
-            "role": "user",
-            "parts": [{"text": user_message}]
-        })
+        conversation.append({"role": "user", "content": user_message})
 
-        # Gemini requires strictly alternating roles (user, model, user...)
-        # Attempt to combine back-to-back same-role messages
+        # Deduplicate back-to-back same-role messages
         if not conversation:
             return conversation
-            
+
         deduped = []
         for msg in conversation:
             if deduped and deduped[-1]["role"] == msg["role"]:
-                deduped[-1]["parts"][0]["text"] += f"\n\n{msg['parts'][0]['text']}"
+                deduped[-1]["content"] += f"\n\n{msg['content']}"
             else:
                 deduped.append(msg)
-                
-        # First message must be "user" or "model" (Gemini generally ok as long as alternating)
+
         return deduped
 
     def generate_summary(self, agent, messages):
@@ -113,23 +117,10 @@ Provide a 2-3 paragraph summary focusing on:
 3. Any outcomes or decisions made"""
 
         try:
-            headers = {"Content-Type": "application/json"}
-            response = requests.post(
-                self.base_url,
-                headers=headers,
-                json={
-                    "contents": [{"role": "user", "parts": [{"text": prompt}]}]
-                },
-                timeout=120
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-                text = self._get_gemini_text_from_response(result)
-                return text if text else 'Summary generation failed.'
-            elif response.status_code == 429:
-                return "Summary generation failed: Gemini API quota exceeded."
-            return f"Summary generation failed (HTTP {response.status_code})."
+            result = self._call_api(None, [{"role": "user", "content": prompt}], timeout=120)
+            if result is None:
+                return 'Summary generation failed.'
+            return result
         except Exception as e:
             print(f"Summary generation error: {e}")
             return "Summary generation failed."
@@ -168,23 +159,10 @@ Provide:
 Keep feedback constructive and helpful."""
 
         try:
-            headers = {"Content-Type": "application/json"}
-            response = requests.post(
-                self.base_url,
-                headers=headers,
-                json={
-                    "contents": [{"role": "user", "parts": [{"text": prompt}]}]
-                },
-                timeout=120
-            )
-
-            if response.status_code == 200:
-                result = response.json()
-                text = self._get_gemini_text_from_response(result)
-                return text if text else 'Feedback generation failed.'
-            elif response.status_code == 429:
-                return "Feedback generation failed: Gemini API quota exceeded."
-            return f"Feedback generation failed (HTTP {response.status_code})."
+            result = self._call_api(None, [{"role": "user", "content": prompt}], timeout=120)
+            if result is None:
+                return 'Feedback generation failed.'
+            return result
         except Exception as e:
             print(f"Feedback generation error: {e}")
             return "Feedback generation failed."
@@ -254,52 +232,24 @@ INSTRUCTIONS:
 
         contents = []
         for h in chat_history[-10:]:
-            role = "model" if h['role'] == "agent" else "user"
-            contents.append({
-                "role": role,
-                "parts": [{"text": h['content']}]
-            })
-            
-        contents.append({
-            "role": "user",
-            "parts": [{"text": user_message}]
-        })
-        
-        # Deduplicate same roles back to back for Gemini
+            role = "assistant" if h['role'] == "agent" else "user"
+            contents.append({"role": role, "content": h['content']})
+
+        contents.append({"role": "user", "content": user_message})
+
+        # Deduplicate same roles back to back
         deduped = []
         for msg in contents:
             if deduped and deduped[-1]["role"] == msg["role"]:
-                deduped[-1]["parts"][0]["text"] += f"\n\n{msg['parts'][0]['text']}"
+                deduped[-1]["content"] += f"\n\n{msg['content']}"
             else:
                 deduped.append(msg)
 
         try:
-            headers = {"Content-Type": "application/json"}
-            payload = {
-                "systemInstruction": {
-                    "parts": [{"text": system_prompt}]
-                },
-                "contents": deduped
-            }
-
-            response = requests.post(
-                self.base_url,
-                headers=headers,
-                json=payload,
-                timeout=90
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                text = self._get_gemini_text_from_response(result)
-                if text:
-                    return text
+            result = self._call_api(system_prompt, deduped, timeout=90)
+            if result is None:
                 return 'Unable to generate response.'
-            elif response.status_code in [400, 403]:
-                return "API Key is missing or invalid. Please check your backend configuration."
-            elif response.status_code == 429:
-                return "Gemini API Error: Quota exceeded. Please check your API billing details."
-            return f"Report analysis failed (HTTP {response.status_code}). Please try again."
+            return result
         except Exception as e:
             print(f"Report chat error: {e}")
             return "Report analysis failed. Please try again."

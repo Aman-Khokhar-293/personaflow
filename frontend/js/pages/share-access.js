@@ -406,6 +406,9 @@ const ShareVideoPage = {
     isSpeaking: false,
     isChatOpen: false,
     selectedVoice: null,
+    _voiceRequestId: 0,
+    _pendingSpeechTimer: null,
+    _pendingSpeechText: '',
 
     _selectVoice() {
         if (this.selectedVoice) return;
@@ -419,7 +422,40 @@ const ShareVideoPage = {
     callDuration: 0,
     subtitleLines: [],
 
+    resetState() {
+        this.stopCamera();
+        if (this.callTimer) clearInterval(this.callTimer);
+        this.callTimer = null;
+        this.isSpeaking = false;
+        if (this.synthesis) this.synthesis.cancel();
+
+        this.isListening = false;
+        if (this.recognition) {
+            try { this.recognition.stop(); } catch (e) { }
+            this.recognition = null;
+        }
+
+        if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) {
+            Avatar3D.stopSpeaking();
+            Avatar3D.destroy();
+        }
+
+        this.data = null;
+        this.messages = [];
+        this.callDuration = 0;
+        this.isMuted = false;
+        this.isCameraOff = false;
+        this.isSpeakerOff = false;
+        this.isSpeaking = false;
+        this.isChatOpen = false;
+        this.subtitleLines = [];
+        this._voiceRequestId = 0;
+        this._pendingSpeechTimer = null;
+        this._pendingSpeechText = '';
+    },
+
     async render(container, data, token) {
+        this.resetState();
         this.data = data;
         this.messages = data.opening_message ? [{
             role: 'agent',
@@ -999,20 +1035,48 @@ const ShareVideoPage = {
 
     toggleMute() {
         this.isMuted = !this.isMuted;
+        const btn = document.getElementById('mute-btn');
+        if (btn) {
+            btn.innerHTML = this.isMuted ?
+                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>' :
+                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
+            btn.classList.toggle('off', this.isMuted);
+            btn.title = this.isMuted ? 'Unmute' : 'Mute';
+        }
+
         if (this.stream) {
             this.stream.getAudioTracks().forEach(track => {
                 track.enabled = !this.isMuted;
             });
         }
-        this.updateControls();
+
+        if (this.isMuted) {
+            this.stopListening();
+            this.updateStatus('Muted', false);
+        } else {
+            this.startListening();
+        }
+    },
+
+    stopListening() {
+        this.isListening = false;
+        if (this.recognition) {
+            try { this.recognition.stop(); } catch (e) { }
+        }
     },
 
     toggleSpeaker() {
         this.isSpeakerOff = !this.isSpeakerOff;
-        if (this.synthesis) {
-            if (this.isSpeakerOff) {
-                this.synthesis.cancel();
+        if (this.isSpeakerOff) {
+            if (this.synthesis) this.synthesis.cancel();
+            if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) {
+                Avatar3D.stopSpeaking();
             }
+            this.isSpeaking = false;
+            if (this._subtitleAnimFrame) cancelAnimationFrame(this._subtitleAnimFrame);
+            const sub = document.getElementById('subtitles');
+            if (sub) sub.innerHTML = '';
+            this.updateStatus('Listening...', true);
         }
         this.updateControls();
     },
@@ -1240,9 +1304,8 @@ const ShareVideoPage = {
 
                 // ── REAL INTERRUPT: user spoke while agent was talking ──
                 if (this.isSpeaking) {
-                    // Stop agent mid-sentence immediately
                     this.synthesis.cancel();
-                    if (Avatar3D.isInitialized) Avatar3D.stopSpeaking();
+                    if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) Avatar3D.stopSpeaking();
                     if (this._subtitleAnimFrame) cancelAnimationFrame(this._subtitleAnimFrame);
                     this.isSpeaking = false;
                     this.updateStatus('Interrupted — processing...', false);
@@ -1250,8 +1313,19 @@ const ShareVideoPage = {
                     this.updateStatus('Processing...', false);
                 }
 
-                this.showSubtitle('You', text, true);
-                this.sendVoiceMessage(text);
+                // ── DEBOUNCE: accumulate rapid consecutive transcripts ──
+                this._pendingSpeechText += (this._pendingSpeechText ? ' ' : '') + text;
+                this.showSubtitle('You', this._pendingSpeechText, true);
+
+                if (this._pendingSpeechTimer) clearTimeout(this._pendingSpeechTimer);
+                this._pendingSpeechTimer = setTimeout(() => {
+                    const combined = this._pendingSpeechText.trim();
+                    this._pendingSpeechText = '';
+                    this._pendingSpeechTimer = null;
+                    if (combined) {
+                        this.sendVoiceMessage(combined);
+                    }
+                }, 800);
             }
         };
 
@@ -1295,25 +1369,49 @@ const ShareVideoPage = {
     async sendVoiceMessage(text) {
         if (!text.trim()) return;
 
+        // ── REQUEST GENERATION COUNTER ──
+        const requestId = ++this._voiceRequestId;
+
+        // Stop any current speech immediately
+        if (this.isSpeaking) {
+            this.synthesis.cancel();
+            if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) Avatar3D.stopSpeaking();
+            if (this._subtitleAnimFrame) cancelAnimationFrame(this._subtitleAnimFrame);
+            this.isSpeaking = false;
+        }
+
+        const sub = document.getElementById('subtitles');
+        if (sub) sub.innerHTML = '';
+
         // Add user message
         this.addMessage('user', text);
-        this.showSubtitle('You', text, false);
+        this.updateStatus('Processing...', false);
 
         try {
-            this.updateStatus('Thinking...', false);
-
             const response = await API.post(`/conversations/${this.data.conversation_id}/messages`, {
                 content: text
             });
 
+            // ── STALE CHECK: discard if a newer request was fired ──
+            if (requestId !== this._voiceRequestId) {
+                console.log(`Discarding stale response (req ${requestId}, current ${this._voiceRequestId})`);
+                return;
+            }
+
             const agentMessage = response.agent_message.content;
             this.addMessage('agent', agentMessage);
-            this.speakWithSubtitles(agentMessage);
-            this.updateStatus('Listening...', true);
+
+            if (!this.isSpeakerOff) {
+                this.speakWithSubtitles(agentMessage);
+            } else {
+                this.updateStatus('Listening...', true);
+            }
 
         } catch (error) {
-            console.error('Failed to send message:', error);
-            this.updateStatus('Error', false);
+            if (requestId === this._voiceRequestId) {
+                console.error('Failed to send message:', error);
+                this.updateStatus('Listening...', true);
+            }
         }
     },
 
@@ -1378,7 +1476,7 @@ const ShareVideoPage = {
 
         // Stop any current speech
         if (this.synthesis) this.synthesis.cancel();
-        if (Avatar3D.isInitialized) Avatar3D.stopSpeaking();
+        if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) Avatar3D.stopSpeaking();
         if (this._subtitleAnimFrame) cancelAnimationFrame(this._subtitleAnimFrame);
 
         this.isSpeaking = true;
@@ -1395,13 +1493,20 @@ const ShareVideoPage = {
             this.updateStatus('Listening...', true);
         };
 
-        if (Avatar3D.isInitialized) {
-            Avatar3D.speak(text, onSpeakEnd).then(() => {
-                this._startWordByWordSubtitles(text);
-            }).catch(() => {
-                this.showSubtitle(this.data.agent.name, text, false);
-                this._fallbackSpeak(text, onSpeakEnd);
-            });
+        if (typeof Avatar3D !== 'undefined' && Avatar3D.isInitialized) {
+            Avatar3D.speak(text, onSpeakEnd)
+                .then((success) => {
+                    if (success === false) {
+                        this.showSubtitle(this.data.agent.name, text, false);
+                        this._fallbackSpeak(text, onSpeakEnd);
+                    } else {
+                        this._startWordByWordSubtitles(text);
+                    }
+                })
+                .catch(() => {
+                    this.showSubtitle(this.data.agent.name, text, false);
+                    this._fallbackSpeak(text, onSpeakEnd);
+                });
         } else {
             this.showSubtitle(this.data.agent.name, text, false);
             this._fallbackSpeak(text, onSpeakEnd);

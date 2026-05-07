@@ -98,6 +98,9 @@ const VideoCallPage = {
         this.isSpeaking = false;
         this.isChatOpen = false;
         this.subtitleLines = [];
+        this._voiceRequestId = 0;
+        this._pendingSpeechTimer = null;
+        this._pendingSpeechText = '';
     },
 
     renderVideoCall(container) {
@@ -765,17 +768,28 @@ const VideoCallPage = {
                 if (wordCount < 2 && text.length < 4) return;
 
                 // ── REAL INTERRUPT: user spoke while agent was talking ──
-                // AEC already cleaned the mic, so this is definitely the user.
-                // Stop the agent immediately and process the user's message.
                 if (this.isSpeaking) {
-                    this.stopSpeaking();   // cut agent mid-sentence
+                    this.stopSpeaking();
                     this.updateStatus('Interrupted — processing...', false);
                 } else {
                     this.updateStatus('Processing...', false);
                 }
 
-                this.showSubtitle('You', text, true);
-                this.sendVoiceMessage(text);
+                // ── DEBOUNCE: accumulate rapid consecutive transcripts ──
+                // If the user speaks two sentences quickly, they get merged
+                // into a single request instead of firing two overlapping ones.
+                this._pendingSpeechText += (this._pendingSpeechText ? ' ' : '') + text;
+                this.showSubtitle('You', this._pendingSpeechText, true);
+
+                if (this._pendingSpeechTimer) clearTimeout(this._pendingSpeechTimer);
+                this._pendingSpeechTimer = setTimeout(() => {
+                    const combined = this._pendingSpeechText.trim();
+                    this._pendingSpeechText = '';
+                    this._pendingSpeechTimer = null;
+                    if (combined) {
+                        this.sendVoiceMessage(combined);
+                    }
+                }, 800);
             }
         };
 
@@ -817,7 +831,13 @@ const VideoCallPage = {
             this.updateStatus('Listening...', true);
 
             if (this.recognition) {
-                try { this.recognition.start(); } catch (e) { /* already started */ }
+                try {
+                    this.recognition.start();
+                } catch (e) {
+                    console.warn('Could not start recognition, recreating...', e);
+                    this.setupSpeechRecognition();
+                    try { this.recognition.start(); } catch (e2) { console.error('Failed to start new recognition', e2); }
+                }
             }
         } catch (e) {
             console.error('Microphone access error:', e);
@@ -843,6 +863,16 @@ const VideoCallPage = {
     },
 
     async sendVoiceMessage(content) {
+        // ── REQUEST GENERATION COUNTER ──
+        // Increment to invalidate any in-flight request's response.
+        // Only the latest request's response will be spoken.
+        const requestId = ++this._voiceRequestId;
+
+        // Stop any current speech immediately
+        if (this.isSpeaking) {
+            this.stopSpeaking();
+        }
+
         this.clearSubtitle();
         this.updateStatus('Processing...', false);
 
@@ -859,6 +889,12 @@ const VideoCallPage = {
                 content: content
             });
 
+            // ── STALE CHECK: discard if a newer request was fired ──
+            if (requestId !== this._voiceRequestId) {
+                console.log(`Discarding stale response (req ${requestId}, current ${this._voiceRequestId})`);
+                return;
+            }
+
             // Add agent response
             this.messages.push(response.agent_message);
             this.updateDrawerMessages();
@@ -871,8 +907,11 @@ const VideoCallPage = {
             }
 
         } catch (error) {
-            Toast.error('Failed to send message');
-            this.updateStatus('Listening...', true);
+            // Only show error if this is still the active request
+            if (requestId === this._voiceRequestId) {
+                Toast.error('Failed to send message');
+                this.updateStatus('Listening...', true);
+            }
         }
     },
 
