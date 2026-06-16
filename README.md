@@ -1,3 +1,13 @@
+---
+title: PersonaFlow
+emoji: 🤖
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # PersonaFlow — Dynamic AI Conversation Agent Platform
 
 > **AI Quick-Reference README** — This file exists so an AI assistant can rapidly understand the full project without scanning every file.
