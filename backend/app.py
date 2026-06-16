@@ -14,23 +14,32 @@ load_dotenv()
 firebase_initialized = False
 try:
     import os
+    import json
     import firebase_admin
     from firebase_admin import auth as firebase_auth
     
-    # Check if local credentials file exists
+    # Priority 1: FIREBASE_CREDENTIALS env var (JSON string — for HF Spaces)
+    firebase_creds_json = os.environ.get('FIREBASE_CREDENTIALS', '').strip()
+    # Priority 2: Local credentials file
     cred_path = os.path.join(os.path.dirname(__file__), 'firebase-credentials.json')
-    if os.path.exists(cred_path):
+    
+    if firebase_creds_json:
+        cred_dict = json.loads(firebase_creds_json)
+        cred = firebase_admin.credentials.Certificate(cred_dict)
+        firebase_admin.initialize_app(cred)
+        print(f"[Firebase] Admin SDK initialized from FIREBASE_CREDENTIALS env var (project: {cred_dict.get('project_id', '?')}).")
+    elif os.path.exists(cred_path):
         cred = firebase_admin.credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
-        print("[Firebase] Admin SDK initialized successfully using service account credentials.")
+        print("[Firebase] Admin SDK initialized using service account credentials file.")
     else:
         firebase_project_id = os.environ.get('FIREBASE_PROJECT_ID')
         if firebase_project_id and firebase_project_id != 'your-firebase-project-id':
             firebase_admin.initialize_app(options={'projectId': firebase_project_id})
-            print(f"[Firebase] Admin SDK initialized successfully for project: {firebase_project_id}")
+            print(f"[Firebase] Admin SDK initialized for project: {firebase_project_id} (token verification may fail without credentials).")
         else:
             firebase_admin.initialize_app()
-            print("[Firebase] Admin SDK initialized successfully.")
+            print("[Firebase] Admin SDK initialized (default).")
     firebase_initialized = True
 except Exception as e:
     print(f"[Firebase] Warning: Could not initialize Firebase Admin: {e}")
