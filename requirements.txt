@@ -27,3 +27,6 @@ SpeechRecognition
 python-dotenv
 firebase-admin
 
+# PostgreSQL Database Adapter
+psycopg2-binary
+
