@@ -125,7 +125,7 @@ const DashboardPage = {
                         <span class="badge ${agent.status === 'active' ? 'active' : 'inactive'}">
                             ${agent.status}
                         </span>
-                        <div style="color: var(--gray-400);">→</div>
+                        <div class="list-item-arrow" style="color: var(--gray-400);">→</div>
                     </a>
                 `).join('');
             }

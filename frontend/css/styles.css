@@ -4933,6 +4933,28 @@ tr:hover td {
     .step-connector {
         display: none;
     }
+
+    /* Make Dashboard lists readable on narrow screens */
+    .list-item {
+        position: relative;
+        padding-right: 5rem !important;
+    }
+    
+    .list-item .badge {
+        position: absolute !important;
+        top: 1.25rem !important;
+        right: 1rem !important;
+        margin: 0 !important;
+    }
+    
+    .list-item-arrow {
+        display: none !important;
+    }
+    
+    .list-item-title, .list-item-subtitle {
+        white-space: normal !important;
+        word-break: break-word;
+    }
 }
 
 /* ============================================================================
