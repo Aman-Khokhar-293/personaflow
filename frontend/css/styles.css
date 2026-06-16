@@ -4864,6 +4864,12 @@ tr:hover td {
         padding-left: 4.5rem !important;
     }
 
+    .btn-icon {
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 1.25rem !important;
+    }
+
     .step-connector {
         width: 30px;
     }
