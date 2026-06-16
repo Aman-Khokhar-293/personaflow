@@ -57,3 +57,6 @@ yarn-error.log*
 frontend/image/uploads/
 frontend/3d-assets/audio/
 !frontend/3d-assets/audio/.gitkeep
+
+# Sensitive Firebase Credentials
+backend/firebase-credentials.json

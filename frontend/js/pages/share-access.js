@@ -1350,8 +1350,10 @@ const ShareVideoPage = {
 
         try {
             if (!this.audioStream) {
+                // Request microphone access (triggers permission prompt)
                 this.audioStream = await navigator.mediaDevices.getUserMedia({
-                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                    video: false
                 });
             }
 
@@ -1359,10 +1361,17 @@ const ShareVideoPage = {
             this.updateStatus('Listening...', true);
 
             if (this.recognition) {
-                try { this.recognition.start(); } catch (e) { }
+                try {
+                    this.recognition.start();
+                } catch (e) {
+                    console.warn('Could not start recognition, recreating...', e);
+                    this.setupSpeechRecognition();
+                    try { this.recognition.start(); } catch (e2) { console.error('Failed to start new recognition', e2); }
+                }
             }
         } catch (e) {
             console.error('Microphone access error:', e);
+            this.updateStatus('Mic Denied', false);
         }
     },
 

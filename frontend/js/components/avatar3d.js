@@ -602,6 +602,24 @@ const Avatar3D = {
     },
 
     /**
+     * Stop any active audio and speech animation
+     */
+    stopSpeaking() {
+        this.isSpeaking = false;
+        if (this.currentAudio) {
+            try {
+                this.currentAudio.pause();
+                this.currentAudio.currentTime = 0;
+            } catch (e) {}
+            this.currentAudio = null;
+        }
+        this.visemeTimeline = null;
+        this.currentVisemeTargets = {};
+        this.moodTargets = {};
+        this.resetVisemeMorphTargets();
+    },
+
+    /**
      * Reset all viseme and expression morph targets to 0
      */
     resetVisemeMorphTargets() {

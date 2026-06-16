@@ -25,3 +25,5 @@ openai-whisper
 pydub
 SpeechRecognition
 python-dotenv
+firebase-admin
+

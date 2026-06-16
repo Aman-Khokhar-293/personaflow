@@ -1127,6 +1127,14 @@ const VideoCallPage = {
         }
     },
 
+    _resumeListeningAfterSpeech() {
+        if (this.isListening && !this.isMuted) {
+            try {
+                this.recognition.start();
+            } catch (e) {}
+        }
+    },
+
     showSubtitle(speaker, text, isUser) {
         const subtitles = document.getElementById('subtitles');
         if (subtitles) {

@@ -9,6 +9,32 @@ from dotenv import load_dotenv
 
 # Load environment variables from backend/.env file
 load_dotenv()
+
+# Initialize Firebase Admin SDK
+firebase_initialized = False
+try:
+    import os
+    import firebase_admin
+    from firebase_admin import auth as firebase_auth
+    
+    # Check if local credentials file exists
+    cred_path = os.path.join(os.path.dirname(__file__), 'firebase-credentials.json')
+    if os.path.exists(cred_path):
+        cred = firebase_admin.credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
+        print("[Firebase] Admin SDK initialized successfully using service account credentials.")
+    else:
+        firebase_project_id = os.environ.get('FIREBASE_PROJECT_ID')
+        if firebase_project_id and firebase_project_id != 'your-firebase-project-id':
+            firebase_admin.initialize_app(options={'projectId': firebase_project_id})
+            print(f"[Firebase] Admin SDK initialized successfully for project: {firebase_project_id}")
+        else:
+            firebase_admin.initialize_app()
+            print("[Firebase] Admin SDK initialized successfully.")
+    firebase_initialized = True
+except Exception as e:
+    print(f"[Firebase] Warning: Could not initialize Firebase Admin: {e}")
+
 from datetime import datetime, timedelta
 from functools import wraps
 import secrets
@@ -160,6 +186,67 @@ def login():
         'message': 'Login successful',
         'user': user.to_dict()
     })
+
+@app.route('/api/auth/google', methods=['POST'])
+def google_login():
+    data = request.json
+    id_token = data.get('idToken')
+    
+    if not id_token:
+        return jsonify({'error': 'Firebase ID token is required'}), 400
+        
+    if not firebase_initialized:
+        return jsonify({'error': 'Firebase Admin SDK is not initialized. Check server logs.'}), 500
+        
+    try:
+        # Verify the ID token using Firebase Admin SDK
+        decoded_token = firebase_auth.verify_id_token(id_token)
+        email = decoded_token.get('email')
+        if email:
+            email = email.lower()
+            name = decoded_token.get('name', 'Google User')
+        else:
+            phone_number = decoded_token.get('phone_number')
+            if phone_number:
+                email = f"{phone_number}@phone.firebase.com"
+                name = decoded_token.get('name', f"Phone User {phone_number}")
+            else:
+                return jsonify({'error': 'Email or Phone Number not provided by Auth.'}), 400
+            
+        # Check if user already exists
+        user = User.query.filter_by(email=email).first()
+        is_new_user = False
+        
+        if not user:
+            # Register a new user
+            colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#0ea5e9']
+            # Generate a secure random password since password_hash field cannot be null
+            random_password = secrets.token_urlsafe(32)
+            user = User(
+                name=name,
+                email=email,
+                password_hash=generate_password_hash(random_password),
+                avatar_color=random.choice(colors)
+            )
+            db.session.add(user)
+            db.session.commit()
+            
+            # Auto-create default anchoring agent for new user
+            _create_default_anchoring_agent(user.id)
+            is_new_user = True
+            
+        session.permanent = True
+        session['user_id'] = user.id
+        
+        return jsonify({
+            'message': 'Google authentication successful',
+            'user': user.to_dict(),
+            'is_new_user': is_new_user
+        }), 201 if is_new_user else 200
+        
+    except Exception as e:
+        print(f"Error during Google authentication: {e}")
+        return jsonify({'error': f"Failed to verify ID token: {str(e)}"}), 401
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
