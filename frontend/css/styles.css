@@ -4860,6 +4860,10 @@ tr:hover td {
         width: 100% !important;
     }
 
+    .chat-header {
+        padding-left: 4.5rem !important;
+    }
+
     .step-connector {
         width: 30px;
     }
