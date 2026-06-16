@@ -199,7 +199,9 @@ const ReportDetailPage = {
 
             container.innerHTML = `
                 <div class="page-header" style="max-width: 800px; margin: 0 auto;">
-                    <button class="btn btn-secondary" onclick="Router.back()">← Back to Reports</button>
+                    <button class="btn btn-secondary" onclick="Router.back()">
+                        <i class="fas fa-arrow-left"></i> Back to Reports
+                    </button>
                 </div>
 
                 <div class="report-modal-card">

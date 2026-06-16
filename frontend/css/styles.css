@@ -4767,6 +4767,193 @@ tr:hover td {
 }
 
 /* ============================================================================
+   Conversations List
+   ============================================================================ */
+.conv-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.conv-list-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition-fast);
+    cursor: default;
+}
+
+.conv-list-item:hover {
+    box-shadow: var(--card-shadow-lg);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.conv-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.conv-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conv-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.9375rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.conv-meta {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+    margin-top: 0.25rem;
+}
+
+.conv-date {
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.conv-view-btn {
+    flex-shrink: 0;
+}
+
+.conv-menu-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.conv-menu-btn {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.conv-menu-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.conv-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    min-width: 180px;
+    overflow: hidden;
+}
+
+.conv-dropdown-menu.open {
+    display: block;
+}
+
+.conv-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    text-align: left;
+}
+
+.conv-dropdown-item:hover {
+    background: var(--gray-50);
+}
+
+.conv-dropdown-item.danger {
+    color: var(--error);
+}
+
+.conv-dropdown-item.danger:hover {
+    background: var(--error-light);
+}
+
+.conv-dropdown-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 0.8125rem;
+}
+
+/* Dark mode — Conversations */
+[data-theme="dark"] .conv-list-item {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .conv-list-item:hover {
+    border-color: rgba(99, 102, 241, 0.25);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .conv-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--gray-800);
+}
+
+[data-theme="dark"] .conv-dropdown-menu {
+    background: #1e2132;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .conv-dropdown-item {
+    color: var(--gray-800);
+}
+
+[data-theme="dark"] .conv-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .conv-dropdown-item.danger {
+    color: #f87171;
+}
+
+[data-theme="dark"] .conv-dropdown-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================================================
    Mobile Navigation and Responsiveness
    ============================================================================ */
 .mobile-menu-toggle {
@@ -4929,6 +5116,106 @@ tr:hover td {
     .flex-responsive > div {
         width: 100% !important;
     }
+
+    /* Chat Page — Full viewport on mobile */
+    .chat-container {
+        height: calc(100vh - 5.5rem) !important;
+        border-radius: 0 !important;
+    }
+
+    .chat-header {
+        padding: 0.75rem 1rem 0.75rem 1rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .chat-messages {
+        padding: 1rem !important;
+    }
+
+    .chat-input-container {
+        padding: 0.75rem !important;
+    }
+
+    /* All Buttons — Mobile Touch Targets */
+    .btn {
+        min-height: 44px !important;
+        font-size: 0.875rem !important;
+    }
+
+    .btn-sm {
+        min-height: 36px !important;
+    }
+
+    /* Form controls full width on mobile */
+    .form-select {
+        width: 100% !important;
+    }
+
+    /* Agent Card Grid — full width */
+    .agents-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Filter/search bar — stack vertically */
+    .card .flex.items-center.gap-4 {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+    }
+
+    .card .flex.items-center.gap-2 {
+        width: 100% !important;
+    }
+
+    .card .view-toggle {
+        margin-left: 0 !important;
+        align-self: flex-end !important;
+    }
+
+    /* Report cards — single column */
+    .reports-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Modal — near full screen on mobile */
+    .modal {
+        width: 95vw !important;
+        max-width: none !important;
+        max-height: 90vh !important;
+        margin: 5vh auto !important;
+    }
+
+    /* Page title — smaller on mobile */
+    .page-title {
+        font-size: 1.5rem !important;
+    }
+
+    .page-subtitle {
+        font-size: 0.8125rem !important;
+    }
+
+    /* Conversation list — compact on mobile */
+    .conv-list-item {
+        flex-wrap: wrap !important;
+        padding: 1rem !important;
+        gap: 0.75rem !important;
+    }
+
+    .conv-info {
+        flex: 1 1 calc(100% - 70px) !important;
+        min-width: 0 !important;
+    }
+
+    .conv-date {
+        order: 4 !important;
+        text-align: left !important;
+        flex-basis: auto !important;
+    }
+
+    .conv-view-btn {
+        order: 5 !important;
+        margin-left: auto !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -4965,6 +5252,48 @@ tr:hover td {
         white-space: normal !important;
         word-break: break-word;
     }
+
+    /* Extra-small: tighten main content */
+    .main-content {
+        padding: 4.5rem 0.5rem 1rem 0.5rem !important;
+    }
+
+    /* Page header buttons — full width stack */
+    .page-header > div:last-child {
+        width: 100% !important;
+    }
+
+    .page-header .btn {
+        flex: 1 !important;
+        justify-content: center !important;
+    }
+
+    /* Agent icon smaller on tiny phones */
+    .agent-icon {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1.5rem !important;
+    }
+
+    /* Chat — reduce header agent info */
+    .chat-agent-name {
+        font-size: 0.875rem !important;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Tabs — smaller text on tiny screens */
+    .tabs .tab {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    /* Cards — less padding */
+    .card {
+        padding: 1rem !important;
+    }
 }
 
 /* ============================================================================
@@ -4996,10 +5325,15 @@ tr:hover td {
 @media (max-width: 768px) {
     .search-input-wrapper {
         max-width: 140px;
+        transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .search-input-wrapper:focus-within {
         max-width: 100% !important;
-        flex: 1 0 auto;
+        flex: 1 1 100%;
+    }
+
+    .search-expandable:focus {
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
 }

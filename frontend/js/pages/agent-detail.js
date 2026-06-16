@@ -44,6 +44,9 @@ const AgentDetailPage = {
         container.innerHTML = `
             <div class="page-header">
                 <div class="flex items-center gap-4">
+                    <button class="btn btn-icon btn-secondary" onclick="Router.back()" title="Go Back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                     <div class="agent-icon" style="width: 64px; height: 64px; background: ${this.agent.color}; font-size: 2rem; display: flex; align-items: center; justify-content: center; color: white;">${App.getAgentIconHtml(this.agent.icon)}</div>
                     <div>
                         <h1 class="page-title">${this.agent.name}</h1>

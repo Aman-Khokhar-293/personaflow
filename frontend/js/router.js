@@ -28,7 +28,7 @@ const Router = {
     currentRoute: null,
     params: {},
     historyStack: [],
-    _backTimeout: null,
+    _lastBackTime: 0,
 
     /**
      * Initialize router
@@ -144,12 +144,13 @@ const Router = {
      * Go back
      */
     back() {
-        if (this._backTimeout) return;
-        this._backTimeout = setTimeout(() => { this._backTimeout = null; }, 300);
+        const now = Date.now();
+        if (now - this._lastBackTime < 300) return;
+        this._lastBackTime = now;
 
         if (this.historyStack.length > 1) {
             this.historyStack.pop(); // Remove current route
-            const previousHash = this.historyStack.pop(); // Get previous route
+            const previousHash = this.historyStack[this.historyStack.length - 1]; // Peek previous (don't pop — handleRoute will see it's already top)
             window.location.hash = previousHash;
         } else {
             window.location.hash = '#/dashboard';

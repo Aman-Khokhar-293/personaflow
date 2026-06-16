@@ -69,24 +69,42 @@ CORS(app, supports_credentials=True)
 
 # Test database connection and fallback to SQLite if connection fails
 db_url = app.config.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///personaflow.db')
-if db_url.startswith('postgresql'):
+_using_postgres = False
+if db_url.startswith('postgresql') or db_url.startswith('postgres'):
     try:
         from sqlalchemy import create_engine, text
-        print(f"[Database] Testing connection to: {db_url.split('@')[-1] if '@' in db_url else db_url}")
-        test_engine = create_engine(db_url)
+        print(f"[Database] Testing connection to: {db_url.split('@')[-1] if '@' in db_url else '(local)'}")
+        test_engine = create_engine(db_url, connect_args={"connect_timeout": 5})
         with test_engine.connect() as conn:
             conn.execute(text("SELECT 1"))
+        test_engine.dispose()
         print("[Database] PostgreSQL connection successful.")
+        _using_postgres = True
     except Exception as e:
         print(f"[Database] PostgreSQL connection failed: {e}")
         print("[Database] Falling back to local SQLite database...")
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///personaflow.db'
+else:
+    print(f"[Database] Using SQLite database.")
 
 db.init_app(app)
 
-# Create tables
+# Create tables — with a second fallback in case create_all itself fails
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("[Database] Tables created/verified successfully.")
+    except Exception as e:
+        if _using_postgres:
+            print(f"[Database] db.create_all() failed on PostgreSQL: {e}")
+            print("[Database] Falling back to SQLite and retrying...")
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///personaflow.db'
+            # Re-initialize with SQLite
+            db.init_app(app)
+            db.create_all()
+            print("[Database] Tables created successfully on SQLite fallback.")
+        else:
+            raise
 
 # ============================================================================
 # Kokoro TTS — Initialize once at startup (singleton)
