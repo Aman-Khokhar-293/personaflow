@@ -166,5 +166,46 @@ const App = {
         if (diffDays < 7) return `${diffDays} days ago`;
 
         return this.formatDate(dateString);
+    },
+
+    /**
+     * Map emoji icon to FontAwesome HTML tag
+     */
+    getAgentIconHtml(icon) {
+        if (!icon) return '<i class="fas fa-robot"></i>';
+        const map = {
+            '🤖': 'fa-robot',
+            '👤': 'fa-user',
+            '💼': 'fa-briefcase',
+            '🎓': 'fa-graduation-cap',
+            '🏢': 'fa-building',
+            '💡': 'fa-lightbulb',
+            '🎯': 'fa-bullseye',
+            '📊': 'fa-chart-bar',
+            '🔬': 'fa-microscope',
+            '⚡': 'fa-bolt',
+            '🌟': 'fa-star',
+            '🚀': 'fa-rocket',
+            '🎤': 'fa-microphone',
+            '🧘': 'fa-spa',
+            '📚': 'fa-book-open',
+            '🌍': 'fa-globe',
+            '🎧': 'fa-headphones',
+            '⚖️': 'fa-balance-scale',
+            '💻': 'fa-laptop-code',
+            '📋': 'fa-clipboard-list',
+            '🌱': 'fa-seedling',
+            '🧑‍💼': 'fa-user-tie',
+            '📄': 'fa-file-alt',
+            '✍️': 'fa-pen-fancy',
+            '✨': 'fa-magic',
+            '👁': 'fa-eye',
+            '👁️': 'fa-eye',
+            '💬': 'fa-comments',
+            '🔗': 'fa-link'
+        };
+        const trimmed = icon.trim();
+        const faClass = map[trimmed] || (trimmed.startsWith('fa-') ? trimmed : 'fa-robot');
+        return `<i class="fas ${faClass}"></i>`;
     }
 };

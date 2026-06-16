@@ -41,10 +41,10 @@ const AgentsPage = {
                 </div>
                 <div style="display:flex;gap:0.75rem;">
                     <a href="#/templates" class="btn btn-secondary btn-new-agent">
-                        <span>✨</span> Templates
+                        <span><i class="fas fa-magic"></i></span> Templates
                     </a>
                     <a href="#/agents/new" class="btn btn-primary btn-new-agent">
-                        <span>+</span> Create Agent
+                        <span><i class="fas fa-plus"></i></span> Create Agent
                     </a>
                 </div>
             </div>
@@ -73,7 +73,7 @@ const AgentsPage = {
                     </div>
 
                     <button class="btn btn-secondary btn-sm" onclick="AgentsPage.promptNewFolder()" title="Create folder" style="padding:0.4rem 0.75rem;">
-                        📁 New Folder
+                        <i class="fas fa-folder-plus"></i> New Folder
                     </button>
 
                     <div class="view-toggle" style="margin-left: auto; display: flex; gap: 0.25rem;">
@@ -139,7 +139,7 @@ const AgentsPage = {
         if (filtered.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-icon">🤖</div>
+                    <div class="empty-icon" style="font-size: 2rem; color: var(--gray-400); margin-bottom: 0.5rem;"><i class="fas fa-robot"></i></div>
                     <div class="empty-title">No agents found</div>
                     <div class="empty-message">Try adjusting your filters or create a new agent</div>
                     <a href="#/agents/new" class="btn btn-primary">Create Agent</a>
@@ -156,10 +156,10 @@ const AgentsPage = {
             return `
             <div class="card agent-card" onclick="Router.navigate('/agents/${agent.id}')">
                 <div class="agent-card-top">
-                    <div class="agent-icon" style="background: ${agent.color};">${agent.icon}</div>
-                    ${agent.agent_type === 'anchoring' ? '<span class="badge" style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:0.7rem;">🎤 Anchoring</span>' : ''}
-                    ${agent.is_default ? '<span style="position:absolute;top:12px;left:12px;font-size:14px;" title="System Agent">🔒</span>' : ''}
-                    ${folderName ? `<span style="position:absolute;bottom:12px;left:12px;font-size:0.7rem;background:rgba(0,0,0,0.4);color:#fff;border-radius:6px;padding:2px 6px;">📁 ${this._esc(folderName)}</span>` : ''}
+                    <div class="agent-icon" style="background: ${agent.color}; display: flex; align-items: center; justify-content: center; color: white;">${App.getAgentIconHtml(agent.icon)}</div>
+                    ${agent.agent_type === 'anchoring' ? '<span class="badge" style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-size:0.7rem;"><i class="fas fa-microphone" style="font-size: 0.75rem;"></i> Anchoring</span>' : ''}
+                    ${agent.is_default ? '<span style="position:absolute;top:12px;left:12px;font-size:14px;color:var(--gray-400);" title="System Agent"><i class="fas fa-lock"></i></span>' : ''}
+                    ${folderName ? `<span style="position:absolute;bottom:12px;left:12px;font-size:0.7rem;background:rgba(0,0,0,0.4);color:#fff;border-radius:6px;padding:2px 6px;"><i class="fas fa-folder" style="font-size: 0.7rem;"></i> ${this._esc(folderName)}</span>` : ''}
                 </div>
                 <div class="agent-card-body">
                     <div class="agent-name">${agent.name}</div>
@@ -178,7 +178,7 @@ const AgentsPage = {
                         <div class="agent-card-date">Created ${this.formatDate(agent.created_at)}</div>
                         <button class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;font-size:0.7rem;"
                             onclick="event.stopPropagation(); AgentsPage.promptFolder(${agent.id})"
-                            title="Move to folder">📁</button>
+                            title="Move to folder"><i class="fas fa-folder"></i></button>
                     </div>
                 </div>
             </div>

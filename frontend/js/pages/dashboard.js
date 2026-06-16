@@ -107,7 +107,7 @@ const DashboardPage = {
             if (data.recent_agents.length === 0) {
                 agentsContainer.innerHTML = `
                     <div class="empty-state" style="padding: 2rem; text-align: center;">
-                        <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                        <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--gray-400);"><i class="fas fa-robot"></i></div>
                         <div style="color: var(--gray-500);">No agents created yet</div>
                         <a href="#/agents/new" class="btn btn-primary btn-sm" style="margin-top: 1rem;">Create Agent</a>
                     </div>
@@ -115,8 +115,8 @@ const DashboardPage = {
             } else {
                 agentsContainer.innerHTML = data.recent_agents.map(agent => `
                     <a href="#/agents/${agent.id}" class="list-item">
-                        <div class="list-item-icon" style="background: ${agent.color}20; color: ${agent.color};">
-                            ${agent.icon}
+                        <div class="list-item-icon" style="background: ${agent.color}20; color: ${agent.color}; display: flex; align-items: center; justify-content: center;">
+                            ${App.getAgentIconHtml(agent.icon)}
                         </div>
                         <div class="list-item-content">
                             <div class="list-item-title">${agent.name}</div>
@@ -135,7 +135,7 @@ const DashboardPage = {
             if (data.recent_conversations.length === 0) {
                 convsContainer.innerHTML = `
                     <div class="empty-state" style="padding: 2rem; text-align: center;">
-                        <div style="font-size: 2rem; margin-bottom: 1rem;">💬</div>
+                        <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--gray-400);"><i class="fas fa-comments"></i></div>
                         <div style="color: var(--gray-500);">No conversations yet</div>
                     </div>
                 `;

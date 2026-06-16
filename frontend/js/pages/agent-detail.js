@@ -44,7 +44,7 @@ const AgentDetailPage = {
         container.innerHTML = `
             <div class="page-header">
                 <div class="flex items-center gap-4">
-                    <div class="agent-icon" style="width: 64px; height: 64px; background: ${this.agent.color}; font-size: 2rem;">${this.agent.icon}</div>
+                    <div class="agent-icon" style="width: 64px; height: 64px; background: ${this.agent.color}; font-size: 2rem; display: flex; align-items: center; justify-content: center; color: white;">${App.getAgentIconHtml(this.agent.icon)}</div>
                     <div>
                         <h1 class="page-title">${this.agent.name}</h1>
                         <p class="page-subtitle">${this.agent.role}</p>
@@ -119,7 +119,7 @@ const AgentDetailPage = {
                 <!-- Chat Header -->
                 <div style="display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; background:#f8fafc; border-bottom:1px solid var(--border-color);">
                     <div style="display:flex; align-items:center; gap:0.75rem;">
-                        <div style="width:40px; height:40px; border-radius:12px; background:${this.agent.color}22; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">${this.agent.icon}</div>
+                        <div style="width:40px; height:40px; border-radius:12px; background:${this.agent.color}22; display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:${this.agent.color};">${App.getAgentIconHtml(this.agent.icon)}</div>
                         <div>
                             <div style="font-weight:700; color:#111827; font-size:1rem;">${this.agent.name} — Report Chat</div>
                             <div style="font-size:0.75rem; color:#6b7280;">AI assistant with full access to this agent's data</div>

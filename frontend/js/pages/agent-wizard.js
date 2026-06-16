@@ -122,7 +122,7 @@ const AgentWizardPage = {
 
                 <div class="choice-options">
                     <div class="choice-option" id="choice-scratch">
-                        <div class="choice-option-icon">✍️</div>
+                        <div class="choice-option-icon"><i class="fas fa-pen-fancy"></i></div>
                         <h2 class="choice-option-title">Build from Scratch</h2>
                         <p class="choice-option-desc">Design your agent step‑by‑step. Get inspiration ideas to spark your creativity.</p>
                         <button class="btn btn-primary btn-lg" id="btn-scratch">Start Building →</button>
@@ -133,7 +133,7 @@ const AgentWizardPage = {
                     </div>
 
                     <div class="choice-option" id="choice-template">
-                        <div class="choice-option-icon">✨</div>
+                        <div class="choice-option-icon"><i class="fas fa-magic"></i></div>
                         <h2 class="choice-option-title">Use a Template</h2>
                         <p class="choice-option-desc">Pick a ready‑made agent from our library and go live in seconds.</p>
                         <button class="btn btn-outline btn-lg" id="btn-template">Browse Templates →</button>
@@ -168,7 +168,7 @@ const AgentWizardPage = {
                 <div class="scratch-ideas-grid">
                     ${this.scratchIdeas.map((idea, i) => `
                         <div class="scratch-idea-card" data-index="${i}">
-                            <div class="scratch-idea-icon">${idea.icon}</div>
+                            <div class="scratch-idea-icon" style="display: flex; align-items: center; justify-content: center;">${App.getAgentIconHtml(idea.icon)}</div>
                             <div class="scratch-idea-title">${idea.title}</div>
                             <div class="scratch-idea-desc">${idea.desc}</div>
                             <button class="btn btn-outline btn-sm scratch-idea-use" data-index="${i}">Use this idea →</button>
@@ -176,7 +176,7 @@ const AgentWizardPage = {
                     `).join('')}
 
                     <div class="scratch-idea-card scratch-idea-blank" id="start-blank">
-                        <div class="scratch-idea-icon">📄</div>
+                        <div class="scratch-idea-icon"><i class="fas fa-file-alt"></i></div>
                         <div class="scratch-idea-title">Start Completely Blank</div>
                         <div class="scratch-idea-desc">Open the wizard with empty fields and build your own unique agent from the ground up.</div>
                         <button class="btn btn-primary btn-sm">Start Blank →</button>
@@ -263,8 +263,8 @@ const AgentWizardPage = {
         return templates.map(t => `
             <div class="template-card" data-category="${t.category}">
                 <div class="template-card-header" style="background: linear-gradient(135deg, ${t.color}22, ${t.color}11);">
-                    <div class="template-icon" style="background: ${t.color}; color: white;">
-                        ${t.icon}
+                    <div class="template-icon" style="background: ${t.color}; color: white; display: flex; align-items: center; justify-content: center;">
+                        ${App.getAgentIconHtml(t.icon)}
                     </div>
                     <div style="flex: 1;">
                         <div class="template-name">${t.name}</div>
@@ -281,10 +281,10 @@ const AgentWizardPage = {
                 </div>
                 <div class="template-card-footer">
                     <button class="btn btn-outline btn-sm" onclick="TemplatesPage.previewTemplate('${t.id}')">
-                        👁 Preview
+                        <i class="fas fa-eye"></i> Preview
                     </button>
                     <button class="btn btn-primary btn-sm" onclick="AgentWizardPage.confirmUseTemplate('${t.id}')">
-                        ✨ Use Template
+                        <i class="fas fa-magic"></i> Use Template
                     </button>
                 </div>
             </div>
@@ -297,11 +297,11 @@ const AgentWizardPage = {
         if (!t) return;
 
         Modal.open(
-            `Use "${t.icon} ${t.name}" Template?`,
+            `Use "${t.name}" Template?`,
             `
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: ${t.color}11; border-radius: 12px; border: 1px solid ${t.color}33;">
-                    <div style="font-size: 2.5rem;">${t.icon}</div>
+                    <div style="font-size: 2.5rem; display: flex; align-items: center; justify-content: center;">${App.getAgentIconHtml(t.icon)}</div>
                     <div>
                         <div style="font-weight: 700; font-size: 1.1rem; color: var(--gray-900);">${t.name}</div>
                         <div style="color: var(--gray-500); font-size: 0.875rem;">${t.role}</div>
@@ -312,14 +312,14 @@ const AgentWizardPage = {
                     All fields — including rules, tone, and behavior — will be pre-filled based on the template.
                 </p>
                 <div style="background: var(--gray-50); border-radius: 8px; padding: 0.875rem; font-size: 0.875rem; color: var(--gray-600);">
-                    💡 <strong>Tip:</strong> You can edit any detail on the agent detail page after creation.
+                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> You can edit any detail on the agent detail page after creation.
                 </div>
             </div>
             `,
             `
                 <button class="btn btn-secondary" onclick="Modal.close()">Cancel</button>
                 <button class="btn btn-primary" id="confirm-template-btn" onclick="AgentWizardPage.createFromTemplate('${id}')">
-                    ✨ Yes, Create Agent
+                    <i class="fas fa-magic"></i> Yes, Create Agent
                 </button>
             `
         );
@@ -560,8 +560,8 @@ const AgentWizardPage = {
                 <label class="form-label">Choose Icon</label>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     ${icons.map(icon => `
-                        <button class="icon-option ${this.agentData.icon === icon ? 'selected' : ''}" data-icon="${icon}" style="width: 48px; height: 48px; font-size: 1.5rem; border-radius: var(--border-radius); border: 2px solid ${this.agentData.icon === icon ? 'var(--primary-500)' : 'var(--gray-200)'}; background: white; cursor: pointer;" type="button">
-                            ${icon}
+                        <button class="icon-option ${this.agentData.icon === icon ? 'selected' : ''}" data-icon="${icon}" style="width: 48px; height: 48px; font-size: 1.5rem; border-radius: var(--border-radius); border: 2px solid ${this.agentData.icon === icon ? 'var(--primary-500)' : 'var(--gray-200)'}; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;" type="button">
+                            ${App.getAgentIconHtml(icon)}
                         </button>
                     `).join('')}
                 </div>
@@ -587,7 +587,7 @@ const AgentWizardPage = {
             <div style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--border-radius-lg);">
                 <h4 style="margin-bottom: 1rem; color: var(--gray-900);">Preview</h4>
                 <div class="flex items-center gap-4">
-                    <div class="agent-icon" style="width: 64px; height: 64px; background: ${this.agentData.color}; font-size: 2rem;" id="preview-icon">${this.agentData.icon}</div>
+                    <div class="agent-icon" style="width: 64px; height: 64px; background: ${this.agentData.color}; font-size: 2rem; display: flex; align-items: center; justify-content: center; color: white;" id="preview-icon">${App.getAgentIconHtml(this.agentData.icon)}</div>
                     <div>
                         <div style="font-size: 1.25rem; font-weight: 600; color: var(--gray-900);" id="preview-name">${this.agentData.name || 'Agent Name'}</div>
                         <div style="color: var(--gray-500);" id="preview-role">${this.agentData.role || 'Role'}</div>
@@ -692,7 +692,7 @@ const AgentWizardPage = {
                 btn.style.borderColor = 'var(--primary-500)';
                 this.agentData.icon = btn.dataset.icon;
                 const pi = document.getElementById('preview-icon');
-                if (pi) pi.textContent = btn.dataset.icon;
+                if (pi) pi.innerHTML = App.getAgentIconHtml(btn.dataset.icon);
             });
         });
 

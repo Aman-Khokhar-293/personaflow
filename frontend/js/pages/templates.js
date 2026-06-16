@@ -160,8 +160,8 @@ const TemplatesPage = {
         return templates.map(t => `
             <div class="template-card" data-category="${t.category}">
                 <div class="template-card-header" style="background: linear-gradient(135deg, ${t.color}22, ${t.color}11);">
-                    <div class="template-icon" style="background: ${t.color}; color: white;">
-                        ${t.icon}
+                    <div class="template-icon" style="background: ${t.color}; color: white; display: flex; align-items: center; justify-content: center;">
+                        ${App.getAgentIconHtml(t.icon)}
                     </div>
                     <div style="flex: 1;">
                         <div class="template-name">${t.name}</div>
@@ -178,10 +178,10 @@ const TemplatesPage = {
                 </div>
                 <div class="template-card-footer">
                     <button class="btn btn-outline btn-sm" onclick="TemplatesPage.previewTemplate('${t.id}')">
-                        👁 Preview
+                        <i class="fas fa-eye"></i> Preview
                     </button>
                     <button class="btn btn-primary btn-sm" onclick="TemplatesPage.useTemplate('${t.id}')">
-                        ✨ Use Template
+                        <i class="fas fa-magic"></i> Use Template
                     </button>
                 </div>
             </div>
@@ -206,7 +206,7 @@ const TemplatesPage = {
         TemplatesPage._previewId = id;
 
         Modal.open(
-            `${t.icon} ${t.name}`,
+            `${App.getAgentIconHtml(t.icon)} ${t.name}`,
             `
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <div>
@@ -235,7 +235,7 @@ const TemplatesPage = {
             `,
             `
                 <button class="btn btn-secondary" onclick="Modal.close()">Close</button>
-                <button class="btn btn-primary" onclick="Modal.close(); TemplatesPage.useTemplate('${t.id}')">✨ Use Template</button>
+                <button class="btn btn-primary" onclick="Modal.close(); TemplatesPage.useTemplate('${t.id}')"><i class="fas fa-magic"></i> Use Template</button>
             `
         );
     },

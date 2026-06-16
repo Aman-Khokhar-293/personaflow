@@ -7,32 +7,32 @@ const Onboarding = {
     currentStep: 0,
     steps: [
         {
-            icon: '🎉',
+            icon: '<i class="fas fa-award" style="color: #6366f1;"></i>',
             title: 'Welcome to PersonaFlow!',
             desc: 'You\'re about to build your first AI conversation agent. It takes less than 2 minutes and no technical knowledge required.',
             visual: `<div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
                 <div style="background:var(--primary-50,#eef2ff);border-radius:12px;padding:1rem;text-align:center;flex:1;min-width:100px;">
-                    <div style="font-size:1.75rem;margin-bottom:0.5rem;">🤖</div>
+                    <div style="font-size:1.75rem;margin-bottom:0.5rem;color:#6366f1;"><i class="fas fa-robot"></i></div>
                     <div style="font-size:0.75rem;font-weight:600;color:var(--primary-600,#4f46e5);">Create Agents</div>
                 </div>
                 <div style="background:var(--primary-50,#eef2ff);border-radius:12px;padding:1rem;text-align:center;flex:1;min-width:100px;">
-                    <div style="font-size:1.75rem;margin-bottom:0.5rem;">💬</div>
+                    <div style="font-size:1.75rem;margin-bottom:0.5rem;color:#6366f1;"><i class="fas fa-comments"></i></div>
                     <div style="font-size:0.75rem;font-weight:600;color:var(--primary-600,#4f46e5);">Chat & Video Call</div>
                 </div>
                 <div style="background:var(--primary-50,#eef2ff);border-radius:12px;padding:1rem;text-align:center;flex:1;min-width:100px;">
-                    <div style="font-size:1.75rem;margin-bottom:0.5rem;">📊</div>
+                    <div style="font-size:1.75rem;margin-bottom:0.5rem;color:#6366f1;"><i class="fas fa-chart-bar"></i></div>
                     <div style="font-size:0.75rem;font-weight:600;color:var(--primary-600,#4f46e5);">Get Reports</div>
                 </div>
             </div>`
         },
         {
-            icon: '🤖',
+            icon: '<i class="fas fa-robot" style="color: #6366f1;"></i>',
             title: 'What is an AI Agent?',
             desc: 'An agent is an AI persona with a specific role, personality, and purpose — like a Sales Coach, Customer Support Rep, or Interview Trainer.',
             visual: `<div style="background:var(--gray-50,#f9fafb);border-radius:12px;padding:1.25rem;margin-top:1rem;border:1px solid var(--gray-200,#e5e7eb);">
                 <div style="font-weight:600;margin-bottom:0.75rem;color:var(--gray-700,#374151);">Example: Sales Coach Agent</div>
                 <div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;">
-                    <div style="width:36px;height:36px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">💼</div>
+                    <div style="width:36px;height:36px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:white;flex-shrink:0;"><i class="fas fa-briefcase"></i></div>
                     <div style="background:#6366f120;padding:0.75rem;border-radius:8px;font-size:0.85rem;color:var(--gray-700,#374151);">
                         "Tell me about your product. I'm looking for something to solve our reporting problem..."
                     </div>
@@ -45,26 +45,26 @@ const Onboarding = {
             </div>`
         },
         {
-            icon: '🚀',
+            icon: '<i class="fas fa-rocket" style="color: #6366f1;"></i>',
             title: 'Three ways to start',
             desc: 'Create an agent from scratch, use a pre-built template, or use the shared link someone sent you.',
             visual: `<div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem;">
                 <div style="display:flex;gap:0.75rem;align-items:center;padding:0.75rem;background:var(--gray-50,#f9fafb);border-radius:10px;border:1px solid var(--gray-200,#e5e7eb);">
-                    <div style="font-size:1.5rem;">✨</div>
+                    <div style="font-size:1.5rem;color:#6366f1;width:24px;text-align:center;"><i class="fas fa-magic"></i></div>
                     <div>
                         <div style="font-weight:600;font-size:0.875rem;">Templates</div>
                         <div style="font-size:0.8rem;color:var(--gray-500,#6b7280);">Start with Sales Coach, Interview Prep, and more — ready in 1 click</div>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.75rem;align-items:center;padding:0.75rem;background:var(--gray-50,#f9fafb);border-radius:10px;border:1px solid var(--gray-200,#e5e7eb);">
-                    <div style="font-size:1.5rem;">🛠️</div>
+                    <div style="font-size:1.5rem;color:#6366f1;width:24px;text-align:center;"><i class="fas fa-tools"></i></div>
                     <div>
                         <div style="font-weight:600;font-size:0.875rem;">Build from Scratch</div>
                         <div style="font-size:0.8rem;color:var(--gray-500,#6b7280);">Full 4-step wizard to define role, behavior, output & appearance</div>
                     </div>
                 </div>
                 <div style="display:flex;gap:0.75rem;align-items:center;padding:0.75rem;background:var(--gray-50,#f9fafb);border-radius:10px;border:1px solid var(--gray-200,#e5e7eb);">
-                    <div style="font-size:1.5rem;">🔗</div>
+                    <div style="font-size:1.5rem;color:#6366f1;width:24px;text-align:center;"><i class="fas fa-link"></i></div>
                     <div>
                         <div style="font-weight:600;font-size:0.875rem;">Share Links</div>
                         <div style="font-size:0.8rem;color:var(--gray-500,#6b7280);">Share any agent via a link — with password, expiry & usage limits</div>
@@ -73,15 +73,15 @@ const Onboarding = {
             </div>`
         },
         {
-            icon: '🎊',
+            icon: '<i class="fas fa-star" style="color: #f59e0b;"></i>',
             title: 'You\'re all set!',
             desc: 'Let\'s create your first agent. Try a template for the fastest start, or build one from scratch.',
             visual: `<div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;">
-                <a href="#/templates" onclick="Onboarding.finish()" class="btn btn-primary" style="flex:1;justify-content:center;text-align:center;text-decoration:none;">
-                    ✨ Browse Templates
+                <a href="#/templates" onclick="Onboarding.finish()" class="btn btn-primary" style="flex:1;justify-content:center;text-align:center;text-decoration:none;display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-magic"></i> Browse Templates
                 </a>
-                <a href="#/agents/new" onclick="Onboarding.finish()" class="btn btn-secondary" style="flex:1;justify-content:center;text-align:center;text-decoration:none;">
-                    🛠️ Build from Scratch
+                <a href="#/agents/new" onclick="Onboarding.finish()" class="btn btn-secondary" style="flex:1;justify-content:center;text-align:center;text-decoration:none;display:flex;align-items:center;gap:0.5rem;">
+                    <i class="fas fa-tools"></i> Build from Scratch
                 </a>
             </div>`
         }
