@@ -27,6 +27,7 @@ const Router = {
 
     currentRoute: null,
     params: {},
+    historyStack: [],
 
     /**
      * Initialize router
@@ -58,6 +59,12 @@ const Router = {
         if (!route.auth && App.state.isAuthenticated && hash !== '/share/' + params.token) {
             this.navigate('/dashboard');
             return;
+        }
+
+        // Track custom history stack
+        const currentHash = window.location.hash || '#/login';
+        if (this.historyStack.length === 0 || this.historyStack[this.historyStack.length - 1] !== currentHash) {
+            this.historyStack.push(currentHash);
         }
 
         this.currentRoute = route;
@@ -136,7 +143,13 @@ const Router = {
      * Go back
      */
     back() {
-        window.history.back();
+        if (this.historyStack.length > 1) {
+            this.historyStack.pop(); // Remove current route
+            const previousHash = this.historyStack.pop(); // Get previous route
+            window.location.hash = previousHash;
+        } else {
+            window.location.hash = '#/dashboard';
+        }
     },
 
     /**
