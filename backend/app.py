@@ -211,7 +211,12 @@ def google_login():
                 email = f"{phone_number}@phone.firebase.com"
                 name = decoded_token.get('name', f"Phone User {phone_number}")
             else:
-                return jsonify({'error': 'Email or Phone Number not provided by Auth.'}), 400
+                uid = decoded_token.get('uid') or decoded_token.get('user_id')
+                if uid:
+                    email = f"{uid}@github.firebase.com"
+                    name = decoded_token.get('name', 'GitHub User')
+                else:
+                    return jsonify({'error': 'Email, Phone, or UID not provided by Auth.'}), 400
             
         # Check if user already exists
         user = User.query.filter_by(email=email).first()
@@ -1431,4 +1436,5 @@ def save_anchoring_script(agent_id):
 if __name__ == '__main__':
     # use_reloader=False prevents Flask's watchdog from re-importing
     # TensorFlow/Kokoro in a subprocess, which causes native DLL crashes on Windows.
-    app.run(debug=True, port=5000, use_reloader=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, use_reloader=False)
