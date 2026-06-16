@@ -28,6 +28,7 @@ const Router = {
     currentRoute: null,
     params: {},
     historyStack: [],
+    _backTimeout: null,
 
     /**
      * Initialize router
@@ -143,6 +144,9 @@ const Router = {
      * Go back
      */
     back() {
+        if (this._backTimeout) return;
+        this._backTimeout = setTimeout(() => { this._backTimeout = null; }, 300);
+
         if (this.historyStack.length > 1) {
             this.historyStack.pop(); // Remove current route
             const previousHash = this.historyStack.pop(); // Get previous route
