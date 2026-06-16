@@ -11,6 +11,7 @@ const Sidebar = {
     init() {
         this.element = document.getElementById('sidebar');
         this.initDarkMode();
+        this.initMobileToggle();
     },
 
     /**
@@ -19,6 +20,8 @@ const Sidebar = {
     show() {
         if (!this.element) this.init();
         this.element.classList.remove('hidden');
+        const toggle = document.getElementById('mobile-menu-toggle');
+        if (toggle) toggle.classList.remove('hidden');
     },
 
     /**
@@ -27,6 +30,8 @@ const Sidebar = {
     hide() {
         if (!this.element) this.init();
         this.element.classList.add('hidden');
+        const toggle = document.getElementById('mobile-menu-toggle');
+        if (toggle) toggle.classList.add('hidden');
     },
 
     /**
@@ -42,6 +47,32 @@ const Sidebar = {
                 item.classList.remove('active');
             }
         });
+        // Close sidebar on mobile after navigating
+        if (this.element) {
+            this.element.classList.remove('mobile-open');
+            const toggleIcon = document.querySelector('#mobile-menu-toggle i');
+            if (toggleIcon) {
+                toggleIcon.className = 'fas fa-bars';
+            }
+        }
+    },
+
+    /**
+     * Initialize mobile sidebar hamburger toggle
+     */
+    initMobileToggle() {
+        const toggle = document.getElementById('mobile-menu-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                if (this.element) {
+                    const isOpen = this.element.classList.toggle('mobile-open');
+                    const icon = toggle.querySelector('i');
+                    if (icon) {
+                        icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+                    }
+                }
+            });
+        }
     },
 
     /**
