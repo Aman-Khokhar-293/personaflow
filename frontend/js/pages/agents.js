@@ -50,8 +50,11 @@ const AgentsPage = {
             </div>
 
             <div class="card mb-4">
-                <div class="flex items-center gap-4" style="flex-wrap:wrap;">
-                    <input type="text" class="form-input" id="search-agents" placeholder="Search agents..." style="max-width: 220px;">
+                <div class="flex items-center gap-4" style="flex-wrap: wrap;">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-input search-expandable" id="search-agents" placeholder="Search agents...">
+                    </div>
 
                     <div class="flex items-center gap-2">
                         <i class="fas fa-filter" style="color: var(--gray-400); font-size: 0.875rem;"></i>

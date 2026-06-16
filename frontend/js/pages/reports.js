@@ -16,12 +16,12 @@ const ReportsPage = {
             </div>
             
             <div class="card mb-4">
-                <div class="flex items-center gap-4">
-                    <div class="search-input-wrapper" style="flex: 1; max-width: 400px; position: relative;">
-                        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 0.875rem;"></i>
-                        <input type="text" class="form-input" id="search-reports" placeholder="Search reports..." style="padding-left: 36px;">
+                <div class="flex items-center gap-4" style="flex-wrap: wrap;">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-input search-expandable" id="search-reports" placeholder="Search reports...">
                     </div>
-                    <select class="form-select" id="filter-agent" style="width: auto;">
+                    <select class="form-select" id="filter-agent" style="width: auto; flex-shrink: 0;">
                         <option value="all">All Agents</option>
                     </select>
                 </div>
