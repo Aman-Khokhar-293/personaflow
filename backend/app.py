@@ -73,8 +73,11 @@ _using_postgres = False
 if db_url.startswith('postgresql') or db_url.startswith('postgres'):
     try:
         from sqlalchemy import create_engine, text
+        engine_opts = app.config.get('SQLALCHEMY_ENGINE_OPTIONS', {})
+        connect_args = engine_opts.get('connect_args', {})
+        connect_args['connect_timeout'] = 5
         print(f"[Database] Testing connection to: {db_url.split('@')[-1] if '@' in db_url else '(local)'}")
-        test_engine = create_engine(db_url, connect_args={"connect_timeout": 5})
+        test_engine = create_engine(db_url, connect_args=connect_args)
         with test_engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         test_engine.dispose()

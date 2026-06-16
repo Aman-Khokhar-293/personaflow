@@ -18,9 +18,27 @@ class Config:
         query.pop('pgbouncer', None)
         url_parts[4] = urlparse.urlencode(query, doseq=True)
         db_url = urlparse.urlunparse(url_parts)
-        
+
+    # For Supabase pooler connections: add sslmode if not present
+    _is_pg = db_url.startswith('postgresql')
+    if _is_pg and 'pooler.supabase.com' in db_url and 'sslmode' not in db_url:
+        db_url += ('&' if '?' in db_url else '?') + 'sslmode=require'
+
     SQLALCHEMY_DATABASE_URI = db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Engine options for Supabase PgBouncer compatibility
+    if _is_pg:
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'connect_args': {
+                'client_encoding': 'utf8',
+                'connect_timeout': 10,
+            },
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+        }
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {}
     
     # OpenRouter Settings
     OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
