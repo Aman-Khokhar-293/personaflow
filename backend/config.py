@@ -7,8 +7,8 @@ class Config:
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'personaflow-secret-key-change-in-production')
     
-    # Database
-    db_url = os.environ.get('DATABASE_URL', 'sqlite:///personaflow.db')
+    # Database — strip whitespace/newlines from env var
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///personaflow.db').strip()
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
     if 'pgbouncer=' in db_url:
@@ -31,8 +31,8 @@ class Config:
     if _is_pg:
         SQLALCHEMY_ENGINE_OPTIONS = {
             'connect_args': {
-                'client_encoding': 'utf8',
                 'connect_timeout': 10,
+                'options': '-c client_encoding=UTF8',
             },
             'pool_pre_ping': True,
             'pool_recycle': 300,

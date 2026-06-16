@@ -87,6 +87,7 @@ if db_url.startswith('postgresql') or db_url.startswith('postgres'):
         print(f"[Database] PostgreSQL connection failed: {e}")
         print("[Database] Falling back to local SQLite database...")
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///personaflow.db'
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
 else:
     print(f"[Database] Using SQLite database.")
 
@@ -102,6 +103,7 @@ with app.app_context():
             print(f"[Database] db.create_all() failed on PostgreSQL: {e}")
             print("[Database] Falling back to SQLite and retrying...")
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///personaflow.db'
+            app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
             # Re-initialize with SQLite
             db.init_app(app)
             db.create_all()
