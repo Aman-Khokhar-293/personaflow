@@ -66,6 +66,22 @@ app.config.from_object(Config)
 app.config['UPLOAD_FOLDER'] = os.path.join(FRONTEND_DIR, 'image', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 CORS(app, supports_credentials=True)
+
+# Test database connection and fallback to SQLite if connection fails
+db_url = app.config.get('SQLALCHEMY_DATABASE_URI', 'sqlite:///personaflow.db')
+if db_url.startswith('postgresql'):
+    try:
+        from sqlalchemy import create_engine, text
+        print(f"[Database] Testing connection to: {db_url.split('@')[-1] if '@' in db_url else db_url}")
+        test_engine = create_engine(db_url)
+        with test_engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        print("[Database] PostgreSQL connection successful.")
+    except Exception as e:
+        print(f"[Database] PostgreSQL connection failed: {e}")
+        print("[Database] Falling back to local SQLite database...")
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///personaflow.db'
+
 db.init_app(app)
 
 # Create tables
