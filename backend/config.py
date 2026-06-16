@@ -8,7 +8,18 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'personaflow-secret-key-change-in-production')
     
     # Database
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///personaflow.db')
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///personaflow.db')
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    if 'pgbouncer=' in db_url:
+        import urllib.parse as urlparse
+        url_parts = list(urlparse.urlparse(db_url))
+        query = urlparse.parse_qs(url_parts[4])
+        query.pop('pgbouncer', None)
+        url_parts[4] = urlparse.urlencode(query, doseq=True)
+        db_url = urlparse.urlunparse(url_parts)
+        
+    SQLALCHEMY_DATABASE_URI = db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # OpenRouter Settings
