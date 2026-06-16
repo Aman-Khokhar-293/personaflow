@@ -50,27 +50,27 @@ const AgentDetailPage = {
                         <p class="page-subtitle">${this.agent.role}</p>
                     </div>
                     <span class="badge ${this.agent.status}" style="margin-left: 1rem;">${this.agent.status}</span>
-                    ${this.agent.agent_type === 'anchoring' ? '<span class="badge" style="margin-left:0.5rem;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;">🎤 Anchoring Mode</span>' : ''}
-                    ${this.agent.is_default ? '<span class="badge" style="margin-left:0.5rem;background:rgba(99,102,241,0.15);color:#6366f1;">🔒 System Agent</span>' : ''}
+                    ${this.agent.agent_type === 'anchoring' ? '<span class="badge" style="margin-left:0.5rem;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;"><i class="fas fa-microphone"></i> Anchoring Mode</span>' : ''}
+                    ${this.agent.is_default ? '<span class="badge" style="margin-left:0.5rem;background:rgba(99,102,241,0.15);color:#6366f1;"><i class="fas fa-lock"></i> System Agent</span>' : ''}
                 </div>
                 <div class="flex gap-2">
                     ${this.agent.agent_type === 'anchoring' ? `
                         <button class="btn btn-primary" onclick="AgentDetailPage.openRemoteControl()">
-                            🎛️ Remote Control
+                            <i class="fas fa-th-large"></i> Remote Control
                         </button>
                         <button class="btn btn-secondary" onclick="AgentDetailPage.startAnchoring()">
-                            ▶️ Start Performance
+                            <i class="fas fa-play"></i> Start Performance
                         </button>
                     ` : `
                         <button class="btn btn-primary" onclick="AgentDetailPage.startVideoCall()">
-                            📹 Video Call
+                            <i class="fas fa-video"></i> Video Call
                         </button>
                         <button class="btn btn-secondary" onclick="AgentDetailPage.startTextChat()">
-                            💬 Text Chat
+                            <i class="fas fa-comment"></i> Text Chat
                         </button>
                     `}
                     <a href="#/agents/${this.agent.id}/edit" class="btn btn-outline">
-                        ✏️ Edit
+                        <i class="fas fa-edit"></i> Edit
                     </a>
                 </div>
             </div>
@@ -79,8 +79,8 @@ const AgentDetailPage = {
                 <button class="tab ${this.activeTab === 'settings' ? 'active' : ''}" data-tab="settings">Settings</button>
                 <button class="tab ${this.activeTab === 'share-links' ? 'active' : ''}" data-tab="share-links">Share Links</button>
                 <button class="tab ${this.activeTab === 'conversations' ? 'active' : ''}" data-tab="conversations">Conversations</button>
-                <button class="tab ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics">📊 Analytics</button>
-                <button class="tab ${this.activeTab === 'report-chat' ? 'active' : ''}" data-tab="report-chat">🤖 Report Chat</button>
+                <button class="tab ${this.activeTab === 'analytics' ? 'active' : ''}" data-tab="analytics"><i class="fas fa-chart-bar"></i> Analytics</button>
+                <button class="tab ${this.activeTab === 'report-chat' ? 'active' : ''}" data-tab="report-chat"><i class="fas fa-robot"></i> Report Chat</button>
             </div>
             
             <div id="tab-content">
@@ -126,9 +126,9 @@ const AgentDetailPage = {
                         </div>
                     </div>
                     <div style="display:flex; gap:0.5rem;">
-                        <button onclick="AgentDetailPage.rcClearHistory()" title="Clear chat history" style="padding:0.4rem 0.9rem; background:transparent; color:#9ca3af; border:1px solid #e5e7eb; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer;">🗑 Clear</button>
-                        <button onclick="AgentDetailPage.rcDownloadPDF()" style="padding:0.4rem 0.9rem; background:#6366f1; color:white; border:none; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer;">📄 PDF</button>
-                        <button onclick="AgentDetailPage.rcDownloadDOCX()" style="padding:0.4rem 0.9rem; background:#16a34a; color:white; border:none; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer;">📝 DOCX</button>
+                        <button onclick="AgentDetailPage.rcClearHistory()" title="Clear chat history" style="padding:0.4rem 0.9rem; background:transparent; color:#9ca3af; border:1px solid #e5e7eb; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer;"><i class="fas fa-trash-alt"></i> Clear</button>
+                        <button onclick="AgentDetailPage.rcDownloadPDF()" style="padding:0.4rem 0.9rem; background:#6366f1; color:white; border:none; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer;"><i class="fas fa-file-pdf"></i> PDF</button>
+                        <button onclick="AgentDetailPage.rcDownloadDOCX()" style="padding:0.4rem 0.9rem; background:#16a34a; color:white; border:none; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer;"><i class="fas fa-file-word"></i> DOCX</button>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@ const AgentDetailPage = {
     renderAnalyticsTab() {
         return `
             <div class="card">
-                <h4 style="margin-bottom: 1.5rem; color: var(--gray-900);">📊 Agent Analytics</h4>
+                <h4 style="margin-bottom: 1.5rem; color: var(--gray-900);"><i class="fas fa-chart-bar"></i> Agent Analytics</h4>
 
                 <!-- Summary Stats -->
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:2rem;" id="analytics-stats">
@@ -198,17 +198,17 @@ const AgentDetailPage = {
                 ${isAnchoring ? `
                     <div style="margin-bottom:1.5rem;padding:16px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(249,115,22,0.05));border:1px solid rgba(245,158,11,0.2);border-radius:12px;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <span style="font-size:24px;">🎤</span>
+                            <span style="font-size:24px;color:#f59e0b;"><i class="fas fa-microphone"></i></span>
                             <strong style="color:var(--gray-900);">Event Anchoring Agent</strong>
                         </div>
                         <p style="color:var(--gray-600);font-size:0.875rem;margin:0;">This is a script-based anchoring agent. It reads your script line by line with no conversation. Use the Remote Control to manage the performance.</p>
                     </div>
                     
-                    <h4 style="margin-bottom:1rem;color:var(--gray-900);">📝 Anchoring Script</h4>
+                    <h4 style="margin-bottom:1rem;color:var(--gray-900);"><i class="fas fa-file-alt"></i> Anchoring Script</h4>
                     <textarea id="anc-detail-script" class="form-input" style="min-height:200px;font-family:monospace;line-height:1.8;resize:vertical;" placeholder="Enter your anchoring script...&#10;Each line will be spoken separately.">${this.agent.script_content || ''}</textarea>
                     <div style="margin-top:1rem;display:flex;gap:0.5rem;">
-                        <button class="btn btn-primary" onclick="AgentDetailPage.saveScript()">💾 Save Script</button>
-                        <button class="btn btn-secondary" onclick="AgentDetailPage.openRemoteControl()">🎛️ Open Remote Control</button>
+                        <button class="btn btn-primary" onclick="AgentDetailPage.saveScript()"><i class="fas fa-save"></i> Save Script</button>
+                        <button class="btn btn-secondary" onclick="AgentDetailPage.openRemoteControl()"><i class="fas fa-th-large"></i> Open Remote Control</button>
                     </div>
                     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--gray-100);">
                 ` : ''}
@@ -236,7 +236,7 @@ const AgentDetailPage = {
                             <div style="font-size: 0.875rem; color: var(--gray-500);">Rules</div>
                             ${rules.length > 0 ? `
                                 <ul style="margin: 0; padding-left: 1.25rem;">
-                                    ${rules.map(r => `<li>${r}</li>`).join('')}
+                                     ${rules.map(r => `<li>${r}</li>`).join('')}
                                 </ul>
                             ` : '<div>No rules defined</div>'}
                         </div>
@@ -257,12 +257,12 @@ const AgentDetailPage = {
                 ${!this.agent.is_default ? `
                     <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-100); display: flex; justify-content: flex-end;">
                         <button class="btn btn-danger" onclick="AgentDetailPage.deleteAgent()">
-                            🗑️ Delete Agent
+                            <i class="fas fa-trash-alt"></i> Delete Agent
                         </button>
                     </div>
                 ` : `
                     <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-100); text-align: right;">
-                        <span style="color:var(--gray-400);font-size:0.875rem;">🔒 System agent cannot be deleted</span>
+                        <span style="color:var(--gray-400);font-size:0.875rem;"><i class="fas fa-lock"></i> System agent cannot be deleted</span>
                     </div>
                 `}
             </div>
@@ -459,7 +459,7 @@ const AgentDetailPage = {
             if (share_links.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state" style="padding: 2rem;">
-                        <div class="empty-icon">🔗</div>
+                        <div class="empty-icon" style="font-size: 2rem; color: var(--gray-400); margin-bottom: 0.5rem;"><i class="fas fa-link"></i></div>
                         <div class="empty-message">No share links yet</div>
                     </div>
                 `;
@@ -470,10 +470,10 @@ const AgentDetailPage = {
                 <div class="flex items-center justify-between" style="padding: 1rem; border-bottom: 1px solid var(--gray-100);">
                     <div>
                         <div style="font-weight:600; color:var(--gray-900); margin-bottom:0.25rem;">
-                            ${link.name ? `🔗 ${link.name}` : '🔗 Unnamed Link'}
+                            ${link.name ? `<i class="fas fa-link" style="font-size: 0.875rem; color: var(--gray-400);"></i> ${link.name}` : '<i class="fas fa-link" style="font-size: 0.875rem; color: var(--gray-400);"></i> Unnamed Link'}
                         </div>
                         <div class="flex items-center gap-2 mb-1">
-                            ${link.has_password ? '<span class="badge protected">🔒 Protected</span>' : ''}
+                            ${link.has_password ? '<span class="badge protected"><i class="fas fa-lock" style="font-size: 0.75rem;"></i> Protected</span>' : ''}
                             ${link.is_expired ? '<span class="badge expired">Expired</span>' : ''}
                             ${link.is_maxed ? '<span class="badge expired">Max uses reached</span>' : ''}
                         </div>
@@ -485,10 +485,10 @@ const AgentDetailPage = {
                     </div>
                     <div class="flex gap-2">
                         <button class="btn btn-sm btn-secondary" onclick="AgentDetailPage.copyLink('${link.token}')">
-                            📋 Copy Link
+                            <i class="fas fa-copy"></i> Copy Link
                         </button>
                         <button class="btn btn-sm btn-outline" onclick="AgentDetailPage.deleteLink(${link.id})">
-                            🗑️
+                            <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
                 </div>
@@ -508,7 +508,7 @@ const AgentDetailPage = {
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state" style="padding: 2rem;">
-                        <div class="empty-icon">💬</div>
+                        <div class="empty-icon" style="font-size: 2rem; color: var(--gray-400); margin-bottom: 0.5rem;"><i class="fas fa-comments"></i></div>
                         <div class="empty-message">No conversations yet</div>
                     </div>
                 `;
