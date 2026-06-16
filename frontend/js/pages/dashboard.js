@@ -59,7 +59,7 @@ const DashboardPage = {
             </div>
             
             <!-- Main Content Grid -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="dashboard-grid">
                 
                 <!-- Recent Agents -->
                 <div class="card">

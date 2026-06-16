@@ -4795,6 +4795,27 @@ tr:hover td {
     color: var(--gray-200);
 }
 
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.responsive-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.responsive-grid.two-column {
+    grid-template-columns: 1fr 1fr;
+}
+
+.flex-responsive {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 @media (max-width: 992px) {
     .mobile-menu-toggle {
         display: flex;
@@ -4821,8 +4842,9 @@ tr:hover td {
         width: 100% !important;
     }
 
-    .dashboard-grid, .stats-grid, .agents-grid {
+    .dashboard-grid, .stats-grid, .agents-grid, .responsive-grid.two-column {
         grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
     }
 
     .video-call-main {
@@ -4840,6 +4862,58 @@ tr:hover td {
 
     .step-connector {
         width: 30px;
+    }
+
+    /* Page Header Stack on Mobile */
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+    
+    .page-header .flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+    
+    .page-header .flex.gap-2, .page-header .flex.gap-4, .page-header .flex.gap-3 {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+    }
+    
+    .page-header .badge {
+        margin-left: 0 !important;
+        margin-top: 0.25rem !important;
+    }
+
+    /* Tabs Horizontal Scroll on Mobile */
+    .tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding-bottom: 0.5rem !important;
+        margin-bottom: 1.5rem !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 0.5rem !important;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .tabs .tab {
+        flex: 0 0 auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    .flex-responsive {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    .flex-responsive > div {
+        width: 100% !important;
     }
 }
 

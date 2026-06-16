@@ -60,15 +60,30 @@ const Sidebar = {
     /**
      * Initialize mobile sidebar hamburger toggle
      */
+
+
     initMobileToggle() {
         const toggle = document.getElementById('mobile-menu-toggle');
         if (toggle) {
-            toggle.addEventListener('click', () => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
                 if (this.element) {
                     const isOpen = this.element.classList.toggle('mobile-open');
                     const icon = toggle.querySelector('i');
                     if (icon) {
                         icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (this.element && this.element.classList.contains('mobile-open')) {
+                    if (!this.element.contains(e.target) && !toggle.contains(e.target)) {
+                        this.element.classList.remove('mobile-open');
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-bars';
+                        }
                     }
                 }
             });

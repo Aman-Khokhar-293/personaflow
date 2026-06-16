@@ -117,7 +117,7 @@ const AgentDetailPage = {
         return `
             <div class="card" style="padding:0; overflow:hidden; border-radius:16px;">
                 <!-- Chat Header -->
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; background:#f8fafc; border-bottom:1px solid var(--border-color);">
+                <div class="flex-responsive" style="padding:1.25rem 1.5rem; background:#f8fafc; border-bottom:1px solid var(--border-color);">
                     <div style="display:flex; align-items:center; gap:0.75rem;">
                         <div style="width:40px; height:40px; border-radius:12px; background:${this.agent.color}22; display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:${this.agent.color};">${App.getAgentIconHtml(this.agent.icon)}</div>
                         <div>
@@ -213,7 +213,7 @@ const AgentDetailPage = {
                     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--gray-100);">
                 ` : ''}
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div class="responsive-grid two-column">
                     <div>
                         <h4 style="margin-bottom: 1rem; color: var(--gray-900);">Identity</h4>
                         <div class="mb-3">
@@ -666,7 +666,7 @@ const AgentDetailPage = {
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+            <div class="responsive-grid two-column" style="gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label" style="font-weight: 600; color: #111827;">Expires in (days)</label>
                     <input type="number" id="link-expires" class="form-input" placeholder="0 = never" min="0">
