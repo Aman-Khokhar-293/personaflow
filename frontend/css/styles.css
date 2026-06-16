@@ -1158,6 +1158,7 @@ img {
     height: 40px;
     padding: 0;
     border-radius: 50%;
+    flex-shrink: 0 !important;
 }
 
 .btn:disabled {

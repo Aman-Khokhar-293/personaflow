@@ -44,9 +44,9 @@ const ChatPage = {
             <div class="chat-container">
                 <div class="chat-header">
                     <button class="btn btn-icon btn-secondary" onclick="Router.back()" style="margin-right: 0.5rem;">
-                        ←
+                        <i class="fas fa-arrow-left"></i>
                     </button>
-                    <div class="chat-agent-icon" style="background: ${this.agent.color};">${this.agent.icon}</div>
+                    <div class="chat-agent-icon" style="background: ${this.agent.color}; color: white; display: flex; align-items: center; justify-content: center;">${App.getAgentIconHtml(this.agent.icon)}</div>
                     <div class="chat-agent-info">
                         <div class="chat-agent-name">${this.agent.name}</div>
                         <div class="chat-agent-status" id="chat-status-indicator">● Online</div>
@@ -69,11 +69,11 @@ const ChatPage = {
                 ${this.conversation.status === 'active' ? `
                     <div class="chat-input-container">
                         <button class="chat-btn chat-mic-btn" id="mic-btn" title="Voice input (click to start, click again to stop)">
-                            🎤
+                            <i class="fas fa-microphone"></i>
                         </button>
                         <input type="text" class="chat-input" id="chat-input" placeholder="Type your message..." autocomplete="off">
                         <button class="chat-btn chat-send-btn" id="send-btn" title="Send message">
-                            ➤
+                            <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                     <!-- Live STT transcript display -->
@@ -99,7 +99,7 @@ const ChatPage = {
         return this.messages.map(msg => `
             <div class="message ${msg.role === 'user' ? 'user' : 'agent'}">
                 ${msg.role === 'agent' ? `
-                    <div class="message-avatar" style="background: ${this.agent.color}; font-size: 1.25rem;">${this.agent.icon}</div>
+                    <div class="message-avatar" style="background: ${this.agent.color}; font-size: 1.25rem; color: white; display: flex; align-items: center; justify-content: center;">${App.getAgentIconHtml(this.agent.icon)}</div>
                 ` : ''}
                 <div>
                     <div class="message-bubble">${this.formatMessage(msg.content)}</div>
@@ -348,7 +348,7 @@ const ChatPage = {
         indicator.className = 'message agent';
         indicator.id = 'typing-indicator';
         indicator.innerHTML = `
-            <div class="message-avatar" style="background: ${this.agent.color}; font-size: 1.25rem;">${this.agent.icon}</div>
+            <div class="message-avatar" style="background: ${this.agent.color}; font-size: 1.25rem; color: white; display: flex; align-items: center; justify-content: center;">${App.getAgentIconHtml(this.agent.icon)}</div>
             <div class="typing-indicator">
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
