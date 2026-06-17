@@ -23,26 +23,49 @@ try:
     # Priority 2: Local credentials file
     cred_path = os.path.join(os.path.dirname(__file__), 'firebase-credentials.json')
     
+    # Debug: log which paths are available
+    print(f"[Firebase] FIREBASE_CREDENTIALS env var set: {bool(firebase_creds_json)} (length: {len(firebase_creds_json)})")
+    print(f"[Firebase] Credentials file exists at {cred_path}: {os.path.exists(cred_path)}")
+    
     if firebase_creds_json:
         cred_dict = json.loads(firebase_creds_json)
         cred = firebase_admin.credentials.Certificate(cred_dict)
-        firebase_admin.initialize_app(cred)
-        print(f"[Firebase] Admin SDK initialized from FIREBASE_CREDENTIALS env var (project: {cred_dict.get('project_id', '?')}).")
+        project_id = cred_dict.get('project_id') or os.environ.get('FIREBASE_PROJECT_ID') or os.environ.get('GOOGLE_CLOUD_PROJECT')
+        # Always set GOOGLE_CLOUD_PROJECT so the auth service can find it
+        if project_id:
+            os.environ.setdefault('GOOGLE_CLOUD_PROJECT', project_id)
+        firebase_admin.initialize_app(cred, options={'projectId': project_id} if project_id else None)
+        print(f"[Firebase] Admin SDK initialized from FIREBASE_CREDENTIALS env var (project: {project_id or '?'}).")
     elif os.path.exists(cred_path):
+        # Read the file to extract project_id for explicit options
+        with open(cred_path, 'r') as f:
+            cred_file_data = json.load(f)
+        project_id = cred_file_data.get('project_id') or os.environ.get('FIREBASE_PROJECT_ID') or os.environ.get('GOOGLE_CLOUD_PROJECT')
         cred = firebase_admin.credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
-        print("[Firebase] Admin SDK initialized using service account credentials file.")
+        # Always set GOOGLE_CLOUD_PROJECT so the auth service can find it
+        if project_id:
+            os.environ.setdefault('GOOGLE_CLOUD_PROJECT', project_id)
+        firebase_admin.initialize_app(cred, options={'projectId': project_id} if project_id else None)
+        print(f"[Firebase] Admin SDK initialized using service account credentials file (project: {project_id or '?'}).")
     else:
-        firebase_project_id = os.environ.get('FIREBASE_PROJECT_ID')
+        # Fallback: try FIREBASE_PROJECT_ID or GOOGLE_CLOUD_PROJECT
+        firebase_project_id = (
+            os.environ.get('FIREBASE_PROJECT_ID')
+            or os.environ.get('GOOGLE_CLOUD_PROJECT')
+        )
         if firebase_project_id and firebase_project_id != 'your-firebase-project-id':
+            os.environ.setdefault('GOOGLE_CLOUD_PROJECT', firebase_project_id)
             firebase_admin.initialize_app(options={'projectId': firebase_project_id})
-            print(f"[Firebase] Admin SDK initialized for project: {firebase_project_id} (token verification may fail without credentials).")
+            print(f"[Firebase] WARNING: Admin SDK initialized for project '{firebase_project_id}' WITHOUT service account credentials.")
+            print(f"[Firebase] WARNING: Token verification WILL FAIL. Set the FIREBASE_CREDENTIALS secret on HF Spaces.")
         else:
             firebase_admin.initialize_app()
-            print("[Firebase] Admin SDK initialized (default).")
+            print("[Firebase] WARNING: Admin SDK initialized with NO project ID and NO credentials. OAuth login will NOT work.")
     firebase_initialized = True
 except Exception as e:
-    print(f"[Firebase] Warning: Could not initialize Firebase Admin: {e}")
+    print(f"[Firebase] ERROR: Could not initialize Firebase Admin: {e}")
+    import traceback
+    traceback.print_exc()
 
 from datetime import datetime, timedelta
 from functools import wraps
@@ -248,7 +271,12 @@ def google_login():
         
     try:
         # Verify the ID token using Firebase Admin SDK
+        import sys
+        print(f"[Auth] Verifying ID token (length: {len(id_token)})...", flush=True)
+        print(f"[Auth] Firebase app name: {firebase_admin.get_app().name}", flush=True)
+        print(f"[Auth] Firebase app project_id: {firebase_admin.get_app().project_id}", flush=True)
         decoded_token = firebase_auth.verify_id_token(id_token)
+        print(f"[Auth] Token verified successfully. Provider: {decoded_token.get('firebase', {}).get('sign_in_provider', 'unknown')}", flush=True)
         email = decoded_token.get('email')
         if email:
             email = email.lower()
@@ -298,7 +326,11 @@ def google_login():
         }), 201 if is_new_user else 200
         
     except Exception as e:
-        print(f"Error during Google authentication: {e}")
+        import sys, traceback
+        print(f"[Auth] ERROR during authentication: {e}", flush=True)
+        traceback.print_exc()
+        sys.stdout.flush()
+        sys.stderr.flush()
         return jsonify({'error': f"Failed to verify ID token: {str(e)}"}), 401
 
 @app.route('/api/auth/logout', methods=['POST'])
