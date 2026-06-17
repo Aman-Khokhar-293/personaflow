@@ -809,10 +809,15 @@ const ShareVideoPage = {
                 padding: 0.6rem 1rem;
                 text-align: center;
                 transition: all 0.3s ease;
+                display: none;
+            }
+
+            .vc-subtitles:not(:empty) {
+                display: block;
             }
 
             .vc-subtitles:empty {
-                opacity: 0;
+                display: none;
             }
 
             .vc-subtitle-line {

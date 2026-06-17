@@ -101,6 +101,7 @@ const VideoCallPage = {
         this._voiceRequestId = 0;
         this._pendingSpeechTimer = null;
         this._pendingSpeechText = '';
+        this._isProcessingVoice = false;
     },
 
     renderVideoCall(container) {
@@ -401,11 +402,15 @@ const VideoCallPage = {
                 padding: 0.75rem 1.25rem;
                 text-align: center;
                 transition: opacity 0.3s ease;
+                display: none;
+            }
+
+            .vc-subtitles:not(:empty) {
+                display: block;
             }
 
             .vc-subtitles:empty {
-                opacity: 0;
-                padding: 0;
+                display: none;
             }
 
             .vc-subtitle-line {
@@ -786,10 +791,13 @@ const VideoCallPage = {
                     const combined = this._pendingSpeechText.trim();
                     this._pendingSpeechText = '';
                     this._pendingSpeechTimer = null;
-                    if (combined) {
+                    if (combined && !this._isProcessingVoice) {
                         this.sendVoiceMessage(combined);
+                    } else if (combined && this._isProcessingVoice) {
+                        // Queue: re-set pending text so it fires after current request completes
+                        this._pendingSpeechText = combined;
                     }
-                }, 800);
+                }, 1500);
             }
         };
 
@@ -863,6 +871,15 @@ const VideoCallPage = {
     },
 
     async sendVoiceMessage(content) {
+        // ── CONCURRENCY GUARD ──
+        // Prevent multiple simultaneous API calls that burn through rate limits
+        if (this._isProcessingVoice) {
+            console.log('Voice request already in progress, queueing...');
+            this._pendingSpeechText += (this._pendingSpeechText ? ' ' : '') + content;
+            return;
+        }
+        this._isProcessingVoice = true;
+
         // ── REQUEST GENERATION COUNTER ──
         // Increment to invalidate any in-flight request's response.
         // Only the latest request's response will be spoken.
@@ -911,6 +928,15 @@ const VideoCallPage = {
             if (requestId === this._voiceRequestId) {
                 Toast.error('Failed to send message');
                 this.updateStatus('Listening...', true);
+            }
+        } finally {
+            this._isProcessingVoice = false;
+
+            // Process any queued speech that arrived while we were busy
+            if (this._pendingSpeechText.trim()) {
+                const queued = this._pendingSpeechText.trim();
+                this._pendingSpeechText = '';
+                this.sendVoiceMessage(queued);
             }
         }
     },

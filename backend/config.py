@@ -42,7 +42,7 @@ class Config:
     
     # OpenRouter Settings
     OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
-    OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'openrouter/auto')
+    OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'google/gemma-4-31b-it:free')
     
     # Session - Fixed for proper cookie handling
     SESSION_TYPE = 'filesystem'

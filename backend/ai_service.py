@@ -18,9 +18,11 @@ class AIService:
 
     def _call_api(self, system_prompt, contents, timeout=60):
         """
-        Send a request to OpenRouter API.
+        Send a request to OpenRouter API with automatic retry on rate limits.
         `contents` should be a list of {'role': 'user'|'assistant', 'content': str}
         """
+        import time
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
@@ -40,20 +42,27 @@ class AIService:
             "messages": messages
         }
 
-        response = requests.post(self.base_url, headers=headers, json=payload, timeout=timeout)
+        max_retries = 3
+        for attempt in range(max_retries + 1):
+            response = requests.post(self.base_url, headers=headers, json=payload, timeout=timeout)
 
-        if response.status_code == 200:
-            data = response.json()
-            try:
-                return data['choices'][0]['message']['content']
-            except (KeyError, IndexError):
-                return None
-        elif response.status_code in [400, 401, 403]:
-            return "API Key is missing or invalid. Please check your backend configuration."
-        elif response.status_code == 429:
-            return "API rate limit reached. Please wait a moment and try again."
-        else:
-            return f"AI API Error (HTTP {response.status_code}): {response.text[:200]}"
+            if response.status_code == 200:
+                data = response.json()
+                try:
+                    return data['choices'][0]['message']['content']
+                except (KeyError, IndexError):
+                    return None
+            elif response.status_code == 429:
+                if attempt < max_retries:
+                    wait_time = 2 ** (attempt + 1)  # 2s, 4s, 8s
+                    print(f"Rate limited (429). Retrying in {wait_time}s... (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
+                return "API rate limit reached. Please wait a moment and try again."
+            elif response.status_code in [400, 401, 403]:
+                return "API Key is missing or invalid. Please check your backend configuration."
+            else:
+                return f"AI API Error (HTTP {response.status_code}): {response.text[:200]}"
 
     # ── Public methods ───────────────────────────────────────────────
 
